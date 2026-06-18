@@ -1,0 +1,43 @@
+# =============================================================================
+# render.yaml
+#
+# This is a "Render Blueprint" file. It lets Render read this ONE file from
+# your GitHub repo and automatically configure your web service — build
+# command, start command, health check path, and so on — instead of you
+# having to click through Render's dashboard and set each thing by hand.
+#
+# HOW TO USE IT:
+#   1. Push this repo to GitHub.
+#   2. In the Render dashboard, choose "New +" -> "Blueprint".
+#   3. Point it at your GitHub repo. Render finds this file automatically
+#      and proposes the service below for you to confirm.
+#
+# You can also skip this file entirely and just use "New +" -> "Web
+# Service" in the Render dashboard, filling in the same settings manually
+# (build command: npm install, start command: npm start). This file is
+# just a convenience so the settings live in your code, version-controlled,
+# instead of being a one-off click-through that's hard to reproduce.
+# =============================================================================
+
+services:
+  - type: web
+    name: pulse-check-api
+    runtime: node
+    plan: free
+    # Render runs this once before every deploy to install dependencies.
+    buildCommand: npm install
+    # Render runs this to actually start your server. This matches the
+    # "start" script in package.json (which itself runs `node src/server.js`).
+    startCommand: npm start
+    # Render will periodically request this path and expect a fast,
+    # successful response to consider your service "healthy". Our /health
+    # route in src/app.js was built exactly for this purpose.
+    healthCheckPath: /health
+    envVars:
+      # Render automatically provides its own PORT value at runtime and
+      # our server.js already reads process.env.PORT, so we don't need to
+      # set a custom PORT here — this is just here so you can see where
+      # you'd add any OTHER environment variables later, e.g. an email
+      # service API key, by adding more entries under envVars.
+      - key: NODE_ENV
+        value: production
